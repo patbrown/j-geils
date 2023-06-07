@@ -33,3 +33,23 @@
   (portal/tap)
   (def p (portal/open))
   (add-tap #'submit-datafied))
+
+(defmacro qrq [pns] (let [n (symbol (str "tools.drilling." (name pns)))]
+                       `(require (quote ~n))))
+(defn jump
+  [quoted-namespace]
+  (do (require quoted-namespace)
+      (in-ns quoted-namespace)))
+
+(defn uptime
+  "Return the date this REPL (Java process) was started."
+  []
+  (java.util.Date. (- (.getTime (java.util.Date.))
+                      (.getUptime (java.lang.management.ManagementFactory/getRuntimeMXBean)))))
+
+(def ls-fns (map (comp keyword first) (ns-publics 'j)))
+
+(defmacro jit
+  "Just in time loading of dependencies, so you can run anything on the classpath in the user namespace. Just wrap it in 2 parens, (( dev/up))"
+  [sym]
+  `(requiring-resolve '~sym))
